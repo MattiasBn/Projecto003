@@ -9,7 +9,7 @@ class ProdutoController extends Controller
     public function index()
     {
         return response()->json(
-            Produto::with(['criador', 'atualizador'])
+            Produto::with(['produtosCriados', 'produtosEditados'])
             ->orderBy('nome')
             ->get()
         );
@@ -32,7 +32,7 @@ class ProdutoController extends Controller
     public function show($id)
     {
         return response()->json(
-            Produto::with(['criador','atualizador'])->findOrFail($id)
+            Produto::with(['produtosCriados','produtosEditados'])->findOrFail($id)
         );
     }
 
