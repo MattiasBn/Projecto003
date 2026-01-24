@@ -56,4 +56,22 @@ class ProdutoController extends Controller
         Produto::destroy($id);
         return response()->json(['msg' => 'Produto removido.']);
     }
+
+public function search(Request $request)
+{
+    $termo = $request->query('q');
+
+    $query = Produto::query();
+
+    if (is_numeric($termo)) {
+        $query->where('id', $termo);
+    }
+
+    $query->orWhere('nome', 'like', "%{$termo}%");
+
+    return response()->json(
+        $query->get()
+    );
+}
+
 }

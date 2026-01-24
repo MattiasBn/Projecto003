@@ -56,4 +56,24 @@ class UserController extends Controller
 
         return response()->json(['msg' => 'Usuário removido.']);
     }
+
+
+   public function search(Request $request)
+{
+    $termo = $request->query('q');
+
+   $users = User::select('id', 'name', 'email')
+    ->where(function ($query) use ($termo) {
+        if (is_numeric($termo)) {
+            $query->where('id', $termo);
+        }
+
+        $query->orWhere('name', 'like', "%{$termo}%")
+              ->orWhere('email', 'like', "%{$termo}%");
+    })
+    ->paginate(10);
+
+     return response()->json($users);
+
+}
 }
