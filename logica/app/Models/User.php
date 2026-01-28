@@ -65,4 +65,13 @@ public function produtosEditados()
         }
 
 
+
+        public function logs()
+{
+    return $this->hasMany(ActivityLog::class, 'entity_id')
+        ->where('entity_type', 'user');
+}
+
+
+
 }

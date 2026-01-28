@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
+            User::observe(UserObserver::class);
+           Produto::observe(ProdutoObserver::class);
 
         // Para testes: intercepta a geração do link e devolve o token puro no JSON
     ResetPassword::createUrlUsing(function ($user, string $token) {
