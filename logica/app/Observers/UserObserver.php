@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\User;
+use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Auth;
 
 class UserObserver
 {
@@ -19,16 +21,13 @@ class UserObserver
         'after' => $user->getAttributes(),
         'performed_by' => Auth::id(),
     ]);
-    
+
     }
 
     /**
      * Handle the User "updated" event.
      */
-    public function updated(User $user): void
-    {
-        //
-    }
+    
 
     /**
      * Handle the User "deleted" event.

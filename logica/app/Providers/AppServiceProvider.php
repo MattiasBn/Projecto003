@@ -5,6 +5,10 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Produto;
+use App\Observers\UserObserver;
+use App\Observers\ProdutoObserver;
+
 
 class AppServiceProvider extends ServiceProvider
 {
