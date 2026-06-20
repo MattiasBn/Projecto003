@@ -177,4 +177,38 @@ class UserController extends Controller
             ],
         ]);
     }
+
+    public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $user->update($request->only([
+        'name', 'email', 'telefone',
+        'provincia', 'municipio', 'bairro',
+        'bio', 'activo',
+    ]));
+
+    // Guarda o avatar se foi enviado
+    if ($request->hasFile('avatar')) {
+        $caminho = $request->file('avatar')->store("avatars/{$user->id}", 'public');
+        $user->update([
+            'avatar' => \Storage::url($caminho),
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Perfil actualizado.',
+        'user'    => [
+            'id'       => $user->id,
+            'name'     => $user->name,
+            'email'    => $user->email,
+            'telefone' => $user->telefone,
+            'avatar'   => $user->avatar,
+            'provincia'=> $user->provincia,
+            'municipio'=> $user->municipio,
+        ],
+    ]);
+}
+
 }
