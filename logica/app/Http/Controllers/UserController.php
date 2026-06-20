@@ -49,37 +49,41 @@ class UserController extends Controller
 
     // ─── 2. Verificar OTP ───────────────────────────────────────────
 
-    public function  verifyPhoneOtp(Request $request)
+   public function verifyPhoneOtp(Request $request)
     {
-       // Deve ficar assim — CORRECTO
         $request->validate([
             'identity' => 'required|string',
             'otp'      => 'required|string|size:6',
         ]);
+
         $telefone = $request->identity;
         $codigo   = $request->otp;
 
+        // 1. Procura o registo ignorando a comparação direta de data do banco
         $verificacao = OtpVerificacao::where('telefone', $telefone)
             ->where('codigo', $codigo)
             ->where('usado', false)
-            ->where('expira_em', '>', Carbon::now())
             ->first();
 
-        if (!$verificacao) {
+        // 2. Se não existir OU se a diferença entre agora e a atualização for maior que 5 minutos
+        if (!$verificacao || Carbon::parse($verificacao->updated_at)->diffInMinutes(Carbon::now()) > 5) {
             return response()->json([
                 'success' => false,
                 'message' => 'Código OTP incorreto ou expirado...',
-            ],  422);
+            ], 422);
         }
 
+        // Marcar como usado para ninguém reutilizar o mesmo código
         $verificacao->update(['usado' => true]);
 
         $user = User::where('telefone', $telefone)->first();
-        $user->update(['telefone_verificado' => true]);
+        
+        if ($user) {
+            $user->update(['telefone_verificado' => true]);
+        }
 
         return $this->responderComToken($user, 'Sessão iniciada via telefone.');
     }
-
     // ─── 3. Login com Google ────────────────────────────────────────
 
     public function loginWithGoogle(Request $request)
@@ -133,21 +137,21 @@ class UserController extends Controller
 
     // ─── Auxiliares ─────────────────────────────────────────────────
 
-    private function enviarOtp(string $telefone)
+   private function enviarOtp(string $telefone)
     {
         $codigo = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
+        // O updateOrCreate agora força a atualização do timer 'updated_at' a cada novo envio
         OtpVerificacao::updateOrCreate(
             ['telefone' => $telefone],
             [
                 'codigo'    => $codigo,
                 'usado'     => false,
-                'expira_em' => Carbon::now()->addMinutes(5),
+                'expira_em' => Carbon::now()->addMinutes(5), // Mantido por compatibilidade da tabela
             ]
         );
 
         // TODO: integrar provider SMS (Infobip / Africa's Talking)
-        // Por agora devolve o código em dev para poderes testar
         return response()->json([
             'success'           => true,
             'action'            => 'verify_otp',
@@ -155,7 +159,6 @@ class UserController extends Controller
             'dev_code_preview'  => $codigo, // ⚠️ remover em produção real
         ]);
     }
-
     private function responderComToken(User $user, string $message)
     {
         $token = $user->createToken('mixa_app')->plainTextToken;

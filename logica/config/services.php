@@ -46,7 +46,9 @@ return [
         '://googleusercontent.com', // WEB
         '://googleusercontent.com', // ANDROID
          '://googleusercontent.com',    // play store
-         '://googleusercontent.com',    // iOS
+         '://googleusercontent.com',   
+         '780362408955-ojhspcjtki3kh9q9q7k9qibpg1fqe771.apps.googleusercontent.com', // WEB (O que tens no .env)
+        '780362408955-befbhr0gsmd5hgu14cb9gh7u3i0un0od.apps.googleusercontent.com', // ANDROID (O que o teu telemóvel envia) // iOS
          
 
 ],
