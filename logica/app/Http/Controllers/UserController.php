@@ -79,7 +79,7 @@ class UserController extends Controller
         $user = User::where('telefone', $telefone)->first();
         
         if ($user) {
-            $user->update(['telefone_verificado' => true]);
+            $user->update(['phone_verified_at' => \Carbon\Carbon::now()]);
         }
 
         return $this->responderComToken($user, 'Sessão iniciada via telefone.');
